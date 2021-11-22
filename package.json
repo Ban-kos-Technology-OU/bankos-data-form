@@ -1,0 +1,11 @@
+{
+  "name": "bankos-data-form",
+  "version": "1.0.0",
+  "description": "Collect data for bankos",
+  "main": "form.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

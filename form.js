@@ -13,12 +13,16 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
     ES: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       required: "Este campo es obligatorio",
-      format: "Porfavor rellena el formato requerido"
+      format: "Porfavor rellena el formato requerido",
+      true: 'Sí',
+      false: 'No'
     },
     PL: {
       months: ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"],
       required: "To pole jest wymagane",
-      format: "Proszę wypełnić wymagany formularz"
+      format: "Proszę wypełnić wymagany formularz",
+      true: 'Tak',
+      false: 'No'
     }
   }
   
@@ -33,6 +37,9 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
   let key = null;
   
   const setFieldValue = (name, value) => {
+    console.log(value)
+    if(value === 'true') value = true;
+    if(value === 'false') value = false;
     currentData[name] = value;
   }
   
@@ -116,6 +123,11 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
           break;
         case 'enum':
           input = createSelect({ name: field.name, options: field.options, value: field.value });
+          loanFormContainer.appendChild(input);
+          input.focus();
+          break;
+        case 'boolean':
+          input = createSelect({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value === 'true' ? true : field.value === 'false' ? false : undefined });
           loanFormContainer.appendChild(input);
           input.focus();
           break;

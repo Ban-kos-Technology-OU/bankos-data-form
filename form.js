@@ -89,6 +89,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
     prevButton.setAttribute('class', 'arrow left');
     prevButton.addEventListener('click', e => {
       console.log(currentData);
+      prevButton.setAttribute('class', 'lds-dual-ring');
       render({ path: '/previous' });
     });
   
@@ -96,7 +97,8 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
     const nextButton = document.createElement('button');
     nextButton.setAttribute('class', 'arrow right');
     nextButton.addEventListener('click', e => {
-      console.log(currentData) 
+      console.log(currentData);
+      nextButton.setAttribute('class', 'lds-dual-ring');
       render({ path: '/next' });
     })
     buttonContainer.appendChild(nextButton);
@@ -127,7 +129,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
           input.focus();
           break;
         case 'boolean':
-          input = createSelect({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value === 'true' ? true : field.value === 'false' ? false : undefined });
+          input = createSelect({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value });
           loanFormContainer.appendChild(input);
           input.focus();
           break;

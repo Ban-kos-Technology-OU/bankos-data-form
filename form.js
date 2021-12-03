@@ -226,7 +226,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
     body: JSON.stringify({
       deviceMemory: navigator.deviceMemory,
       deviceTimezoneOffset: new Date().getTimezoneOffset(),
-      deviceResolution: window.screen.width * window.devicePixelRatio + "x" + window.screen.height * window.devicePixelRatio,
+      deviceResolution: parseInt(window.screen.width * window.devicePixelRatio) + "x" + parseInt(window.screen.height * window.devicePixelRatio),
       language,
       ...fields,
       click: params && params.cid ? { connect: { id: params.cid } } : undefined

@@ -6,7 +6,7 @@
   apiEndpoint -> api.staging.creditozen.es
 */
 
-const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) => {  
+const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer' }) => {  
   console.log("Form loaded")
   
   const translations = {
@@ -26,7 +26,8 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
     }
   }
   
-  const loanFormContainer = document.getElementById('formContainer');
+  const loanFormContainer = document.getElementById(bindElement);
+
   loanFormContainer.addEventListener('keypress', e => {
     if (e.key === 'Enter' || e.keyCode === 13) {
       render({ path: '/next' })
@@ -81,6 +82,34 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
     });
     return select;
   }
+
+  const createDatePicker = ({ field, type }) => {
+    const datePicker = document.createElement('div');
+    datePicker.setAttribute('class', 'date-container');
+    currentData.day = field.value ? field.value.split('-')[2] !== 'undefined' ? field.value.split('-')[2] : '' : '';
+    currentData.month = field.value ? field.value.split('-')[1] !== 'undefined' ? field.value.split('-')[1] : '' : '';
+    currentData.year = field.value ? field.value.split('-')[0] !== 'undefined' ? field.value.split('-')[0] : '' : '';
+    const day = createSelect({ 
+      name: 'day', 
+      options: Array.from(Array(31).keys()).map(item => ((item + 1).toString().padStart(2,'0'))), 
+      value: currentData.day
+    });
+    const month = createSelect({ 
+      name: 'month', 
+      options: translations[language].months.map((month, index) => { return { label: month, value: (index +1).toString().padStart(2, '0') }}), 
+      value: currentData.month
+    });
+    const year = createSelect({ 
+      name: 'year', 
+      options: type === 'dateOfBirth' ? Array.from(Array(65).keys()).map(item => new Date().getFullYear() - 21 - item) : Array.from(Array(65).keys()).map(item => new Date().getFullYear() - item), 
+      value: currentData.year
+    });
+    datePicker.appendChild(day);
+    datePicker.appendChild(month);
+    datePicker.appendChild(year);
+    loanFormContainer.appendChild(datePicker);
+    return datePicker;
+  }
   
   const renderButtons = () => {
     const buttonContainer = document.createElement('div');
@@ -117,53 +146,29 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
       const label = document.createElement('label');
       label.innerText = field.label;
       loanFormContainer.appendChild(label);
-      let input, day, month, year;
+      let input;
       switch(field.type){
         case 'string':
           input = createInput({ name: field.name, value: field.value });
           loanFormContainer.appendChild(input);
-          input.focus();
           break;
         case 'enum':
           input = createSelect({ name: field.name, options: field.options, value: field.value });
           loanFormContainer.appendChild(input);
-          input.focus();
           break;
         case 'boolean':
           input = createSelect({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value });
           loanFormContainer.appendChild(input);
-          input.focus();
           break;
         case 'number':
           input = createInput({ name: field.name, type: 'number', value: field.value });
           loanFormContainer.appendChild(input);
           break;
         case 'dateOfBirth':
-          console.log("Running")
-          const dateOfBirth = document.createElement('div');
-          dateOfBirth.setAttribute('class', 'date-container');
-          currentData.day = field.value ? field.value.split('-')[2] !== 'undefined' ? field.value.split('-')[2] : '' : '';
-          currentData.month = field.value ? field.value.split('-')[1] !== 'undefined' ? field.value.split('-')[1] : '' : '';
-          currentData.year = field.value ? field.value.split('-')[0] !== 'undefined' ? field.value.split('-')[0] : '' : '';
-          day = createSelect({ 
-            name: 'day', 
-            options: Array.from(Array(31).keys()).map(item => ((item + 1).toString().padStart(2,'0'))), 
-            value: currentData.day
-          });
-          month = createSelect({ 
-            name: 'month', 
-            options: translations[language].months.map((month, index) => { return { label: month, value: (index +1).toString().padStart(2, '0') }}), 
-            value: currentData.month
-          });
-          year = createSelect({ 
-            name: 'year', 
-            options: Array.from(Array(65).keys()).map(item => new Date().getFullYear() - 21 - item), 
-            value: currentData.year
-          });
-          dateOfBirth.appendChild(day);
-          dateOfBirth.appendChild(month);
-          dateOfBirth.appendChild(year);
-          loanFormContainer.appendChild(dateOfBirth);
+          input = createDatePicker({ field, type: 'dateOfBirth' })
+          break;
+        case 'datePast':
+          input = createDatePicker({ field, type: 'datePast' })
           break;
       }
       if(failedValidation && path === '/next'){

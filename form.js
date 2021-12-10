@@ -47,6 +47,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
     if(['dateOfBirth','incomeContractStartedAt'].includes(data.currentField)) {
       console.log("mapping", data)
       data[data.currentField] = `${data.year}-${data.month}-${data.day}`;
+      console.log(data[data.currentField])
       delete data.year;
       delete data.month;
       delete data.day
@@ -141,49 +142,28 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint }) 
           console.log("Running")
           const dateOfBirth = document.createElement('div');
           dateOfBirth.setAttribute('class', 'date-container');
+          currentData.day = field.value ? field.value.split('-')[2] !== 'undefined' ? field.value.split('-')[2] : '' : '';
+          currentData.month = field.value ? field.value.split('-')[1] !== 'undefined' ? field.value.split('-')[1] : '' : '';
+          currentData.year = field.value ? field.value.split('-')[0] !== 'undefined' ? field.value.split('-')[0] : '' : '';
           day = createSelect({ 
             name: 'day', 
             options: Array.from(Array(31).keys()).map(item => ((item + 1).toString().padStart(2,'0'))), 
-            value: field.value ? field.value.split('-')[2] : '' 
+            value: currentData.day
           });
           month = createSelect({ 
             name: 'month', 
             options: translations[language].months.map((month, index) => { return { label: month, value: (index +1).toString().padStart(2, '0') }}), 
-            value: field.value ? field.value.split('-')[1] : ''  
+            value: currentData.month
           });
           year = createSelect({ 
             name: 'year', 
             options: Array.from(Array(65).keys()).map(item => new Date().getFullYear() - 21 - item), 
-            value: field.value ? field.value.split('-')[0] : '' 
+            value: currentData.year
           });
           dateOfBirth.appendChild(day);
           dateOfBirth.appendChild(month);
           dateOfBirth.appendChild(year);
           loanFormContainer.appendChild(dateOfBirth);
-          break;
-        case 'datePast':
-          console.log("Running")
-          const datePast = document.createElement('div');
-          datePast.setAttribute('class', 'date-container');
-          day = createSelect({ 
-            name: 'day', 
-            options: Array.from(Array(31).keys()).map(item => ((item + 1).toString().padStart(2,'0'))), 
-            value: field.value ? field.value.split('-')[2] : '' 
-          });
-          month = createSelect({ 
-            name: 'month', 
-            options: translations[language].months.map((month, index) => { return { label: month, value: (index +1).toString().padStart(2, '0') }}), 
-            value: field.value ? field.value.split('-')[1] : ''  
-          });
-          year = createSelect({ 
-            name: 'year', 
-            options: Array.from(Array(65).keys()).map(item => new Date().getFullYear() - item), 
-            value: field.value ? field.value.split('-')[0] : '' 
-          });
-          datePast.appendChild(day);
-          datePast.appendChild(month);
-          datePast.appendChild(year);
-          loanFormContainer.appendChild(datePast);
           break;
       }
       if(failedValidation && path === '/next'){

@@ -202,7 +202,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     })
   }
 
-  const params = localStorage.getItem('routeParams') ? Object.fromEntries(localStorage.getItem('routeParams').replace('?', '').split('&').map(item => item.split('='))) : null;
+  const params = localStorage.getItem('routeParams') ? JSON.parse(localStorage.getItem('routeParams')) : null;
   
   fetch(`${apiEndpoint}/form/createApplication`, 
   { 

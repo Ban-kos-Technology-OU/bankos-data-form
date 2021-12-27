@@ -42,6 +42,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     if(value === 'true') value = true;
     if(value === 'false') value = false;
     currentData[name] = value;
+    if(typeof currentData[name]) currentData[name] = currentData[name].trim();
   }
   
   const mapValuesForSending = data => {

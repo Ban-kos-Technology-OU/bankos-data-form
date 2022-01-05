@@ -7,8 +7,7 @@
 */
 
 const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer' }) => {  
-  console.log("Form loaded")
-  
+
   const translations = {
     ES: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -38,18 +37,15 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
   let key = null;
   
   const setFieldValue = (name, value) => {
-    console.log(value)
     if(value === 'true') value = true;
     if(value === 'false') value = false;
     currentData[name] = value;
-    if(typeof currentData[name]) currentData[name] = currentData[name].trim();
+    if(typeof currentData[name] === 'string') currentData[name] = currentData[name].trim();
   }
   
   const mapValuesForSending = data => {
     if(['dateOfBirth','incomeContractStartedAt'].includes(data.currentField)) {
-      console.log("mapping", data)
       data[data.currentField] = `${data.year}-${data.month}-${data.day}`;
-      console.log(data[data.currentField])
       delete data.year;
       delete data.month;
       delete data.day
@@ -119,7 +115,6 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     const prevButton = document.createElement('button');
     prevButton.setAttribute('class', 'arrow left');
     prevButton.addEventListener('click', e => {
-      console.log(currentData);
       prevButton.setAttribute('class', 'lds-dual-ring');
       render({ path: '/previous' });
     });
@@ -128,7 +123,6 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     const nextButton = document.createElement('button');
     nextButton.setAttribute('class', 'arrow right');
     nextButton.addEventListener('click', e => {
-      console.log(currentData);
       nextButton.setAttribute('class', 'lds-dual-ring');
       render({ path: '/next' });
     })
@@ -140,7 +134,6 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     loanFormContainer.innerHTML = '';
     const currentField = field.name;
     const failedValidation = currentField === field.lastField;
-    console.log(failedValidation, currentField, currentData.lastField)
     if(currentData[field.name] === undefined) currentData = {};
     currentData.currentField = field.name;
     const elements = [];

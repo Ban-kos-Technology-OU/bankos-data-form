@@ -208,7 +208,8 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
       deviceResolution: parseInt(window.screen.width * window.devicePixelRatio) + "x" + parseInt(window.screen.height * window.devicePixelRatio),
       language,
       ...fields,
-      click: params && params.cid ? { connect: { id: params.cid } } : undefined
+      click: params && params.cid ? { connect: { id: params.cid } } : undefined,
+      urlParams: JSON.stringify(params)
     })
   }).then(res => res.json()).then(data => { 
     key = data.key;

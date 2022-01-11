@@ -80,6 +80,31 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     return select;
   }
 
+  const createRadioButtons = ({ name, options, value }) => {
+    const radioButtons = document.createElement('div');
+    radioButtons.setAttribute('class', 'radio-button-container');
+    options.forEach((optionValues) => {
+      const labelValue = document.createElement('label');
+      const inputValue = document.createElement('input');
+      labelValue.innerHTML =  ['string', 'number'].includes(typeof optionValues) ? optionValues : optionValues.label;
+      inputValue.type = "radio";
+      inputValue.name = name;
+      inputValue.id = optionValues.value
+      inputValue.value = optionValues.value;
+      inputValue.checked = optionValues.value == value
+      labelValue.htmlFor = optionValues.value;
+      radioButtons.appendChild(inputValue);
+      radioButtons.appendChild(labelValue);
+      loanFormContainer.appendChild(radioButtons);
+      inputValue.addEventListener('change', e => {  
+        setFieldValue(name, e.target.value)
+      });
+   });
+   return radioButtons
+
+  }
+
+  
   const createDatePicker = ({ field, type }) => {
     const datePicker = document.createElement('div');
     datePicker.setAttribute('class', 'date-container');
@@ -147,11 +172,17 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
           loanFormContainer.appendChild(input);
           break;
         case 'enum':
-          input = createSelect({ name: field.name, options: field.options, value: field.value });
-          loanFormContainer.appendChild(input);
-          break;
+          if(field.options.length <= 6) {
+            input = createRadioButtons({ name: field.name, options: field.options, value: field.value })
+            break;
+          } 
+          else {
+            input = createSelect({ name: field.name, options: field.options, value: field.value });
+            loanFormContainer.appendChild(input);
+            break;
+          }
         case 'boolean':
-          input = createSelect({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value });
+          input = createRadioButtons({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value });
           loanFormContainer.appendChild(input);
           break;
         case 'number':
@@ -172,7 +203,8 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
         errorLabel.style.color = 'red';
         loanFormContainer.appendChild(errorLabel);
       }
-      input && input.focus();
+      
+      input && currentField != "gender" && input.focus();
       renderButtons();
   }
   

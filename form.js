@@ -204,7 +204,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
         loanFormContainer.appendChild(errorLabel);
       }
       
-      input && currentField != "gender" && input.focus();
+      input && input.focus();
       renderButtons();
   }
   

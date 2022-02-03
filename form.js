@@ -220,11 +220,17 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     }
   }
   
-  const render = ({ path='/next' }) => {
-    if(path === '/next') mapValuesForSending(currentData);
+  const render = ({ path='/next', retries=0 }) => {
+    if(path === '/next' && retries === 0) mapValuesForSending(currentData);
     fetch(`${apiEndpoint}/form${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...currentData, key })}).then(res => res.json()).then(data => {
       if(fieldCallback) fieldCallback(data);
       handleResponse(data, path);
+    }).catch(err => {
+      if(retries < 10) {
+        setTimeout(() => {
+          render({ path, retries: retries +1 });
+        }, 3000)
+      }
     })
   }
 

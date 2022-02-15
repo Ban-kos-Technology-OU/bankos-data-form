@@ -22,6 +22,13 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
       format: "Proszę wypełnić wymagany formularz",
       true: 'Tak',
       false: 'No'
+    },
+    MX: {
+      months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      required: "Este campo es obligatorio",
+      format: "Porfavor rellena el formato requerido",
+      true: 'Sí',
+      false: 'No'
     }
   }
   

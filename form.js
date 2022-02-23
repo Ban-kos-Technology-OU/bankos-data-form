@@ -254,7 +254,8 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
       language,
       ...fields,
       click: params && params.cid ? { connect: { id: params.cid } } : undefined,
-      urlParams: JSON.stringify(params)
+      urlParams: JSON.stringify(params),
+      referrer: localStorage.getItem('referrer') || 'direct'
     })
   }).then(res => res.json()).then(data => { 
     key = data.key;
@@ -277,4 +278,22 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
 
 }
 
-if(typeof window !== 'undefined') window.initForm = init;
+const paramsGrab = () => {
+  if(window.location.search){
+    const params = window.location.search ? window.location.search.replace('?','').split('&') : [];
+    const paramObj = {};
+    for(const param of params){
+      const [paramName, paramValue] = param.split('=');
+      paramObj[paramName] = paramValue;
+    }
+    localStorage.setItem('referrer', document?.referrer || 'Direct');
+    localStorage.setItem('routeParams', JSON.stringify(paramObj || {}));
+  } 
+}
+
+if(typeof window !== 'undefined') {
+  window._Bankos = {
+    initForm: init,
+    paramsGrab,
+  }
+}

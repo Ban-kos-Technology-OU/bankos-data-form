@@ -15,22 +15,22 @@ or add the script to the page using script tag
 
 Usage
 
-    const  fields = {    
+    const fields = {    
 	    sourceKey:  "1234", //This detemines the fieds that will be shown
 	    amount:  100,
 	    period:  31
     }
     
-    const  rejectCallback = () => { // Callback when the application is rejected
+    const rejectCallback = () => { // Callback when the application is rejected
 	    window.location.href = "https://www.google.com" 	
     }      
     
-    const  fieldCallback = (data) => { // Callback when the field is advanced
+    const fieldCallback = (data) => { // Callback when the field is advanced
 	    console.log(data);
     }      
     
     // updateField function can be called externally to update fields like amount or period
-    const { updateField } = window.initForm({
+    const { updateField } = window._Bankos.initForm({
 	    fields,
 	    rejectCallback,
 	    fieldCallback,

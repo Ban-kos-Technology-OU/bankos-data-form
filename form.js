@@ -130,7 +130,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     });
     const year = createSelect({ 
       name: 'year', 
-      options: type === 'dateOfBirth' ? Array.from(Array(65).keys()).map(item => new Date().getFullYear() - 21 - item) : Array.from(Array(65).keys()).map(item => new Date().getFullYear() - item), 
+      options: type === 'dateOfBirth' ? Array.from(Array(65).keys()).map(item => new Date().getFullYear() - 18 - item) : Array.from(Array(65).keys()).map(item => new Date().getFullYear() - item), 
       value: currentData.year
     });
     datePicker.appendChild(day);
@@ -286,7 +286,7 @@ const paramsGrab = () => {
       const [paramName, paramValue] = param.split('=');
       paramObj[paramName] = paramValue;
     }
-    localStorage.setItem('referrer', document?.referrer || 'Direct');
+    localStorage.setItem('referrer', document?.referrer || 'direct');
     localStorage.setItem('routeParams', JSON.stringify(paramObj || {}));
   } 
 }

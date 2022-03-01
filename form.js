@@ -259,6 +259,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     })
   }).then(res => res.json()).then(data => { 
     key = data.key;
+    document.dispatchEvent(new Event('loanFormLoaded'));
     render({ path: '/next' });
   });
 

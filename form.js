@@ -286,7 +286,7 @@ const paramsGrab = () => {
       const [paramName, paramValue] = param.split('=');
       paramObj[paramName] = paramValue;
     }
-    localStorage.setItem('referrer', document?.referrer || 'direct');
+    localStorage.setItem('referrer', document ? document.referrer : 'direct');
     localStorage.setItem('routeParams', JSON.stringify(paramObj || {}));
   } 
 }

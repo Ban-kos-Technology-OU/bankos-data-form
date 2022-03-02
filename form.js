@@ -217,11 +217,11 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
   
   const handleResponse = (data, path) => {
     if(data.status === 'redirect'){
+      localStorage.clear();
       window.location.href = data.redirectUrl;
-      localStorage.clear();
     } else if(data.status === 'rejected'){
-      rejectCallback();
       localStorage.clear();
+      rejectCallback();
     } else {
       renderForm(data, path);
     }
@@ -241,7 +241,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
     })
   }
 
-  const params = localStorage.getItem('routeParams') ? JSON.parse(localStorage.getItem('routeParams')) : null;
+  const params = JSON.parse(localStorage.getItem('routeParams') || "{}");
   
   fetch(`${apiEndpoint}/form/createApplication`, 
   { 
@@ -280,7 +280,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
 }
 
 const paramsGrab = async () => {
-  localStorage.setItem('referrer', document ? document.referrer : 'direct');
+  if(location.pathname === '/') localStorage.setItem('referrer', document ? document.referrer : 'direct');
   if(window.location.search){
     let paramObj = Object.fromEntries(new URLSearchParams(window.location.search));
     if(window.location.search.indexOf('redirected=true') === -1){ //Direct hit, new way to do this

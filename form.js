@@ -280,6 +280,7 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
 }
 
 const paramsGrab = async () => {
+  localStorage.setItem('referrer', document ? document.referrer : 'direct');
   if(window.location.search){
     let paramObj = Object.fromEntries(new URLSearchParams(window.location.search));
     if(window.location.search.indexOf('redirected=true') === -1){ //Direct hit, new way to do this
@@ -291,7 +292,6 @@ const paramsGrab = async () => {
         console.error(err);
       }
     }
-    localStorage.setItem('referrer', document ? document.referrer : 'direct');
     localStorage.setItem('routeParams', JSON.stringify(paramObj || {}));
   } 
 }

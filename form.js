@@ -279,13 +279,17 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
 
 }
 
-const paramsGrab = () => {
+const paramsGrab = async () => {
   if(window.location.search){
-    const params = window.location.search ? window.location.search.replace('?','').split('&') : [];
-    const paramObj = {};
-    for(const param of params){
-      const [paramName, paramValue] = param.split('=');
-      paramObj[paramName] = paramValue;
+    let paramObj = Object.fromEntries(new URLSearchParams(window.location.search));
+    if(window.location.search.indexOf('redirected=true') === -1){ //Direct hit, new way to do this
+      try {
+        const { urlWithParams } = await fetch(`https://api.bankos.io/click${window.location.search}&noRedirect=true`).then(res => res.json());
+        const url = new URL(urlWithParams);
+        paramObj = Object.fromEntries(url.searchParams);
+      } catch (err) {
+        console.error(err);
+      }
     }
     localStorage.setItem('referrer', document ? document.referrer : 'direct');
     localStorage.setItem('routeParams', JSON.stringify(paramObj || {}));

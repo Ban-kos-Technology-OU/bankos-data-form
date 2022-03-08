@@ -300,5 +300,9 @@ if(typeof window !== 'undefined') {
   window._Bankos = {
     initForm: init,
     paramsGrab,
+    setKey: (key) => {
+      currentData.key = key;
+    },
+    render
   }
 }

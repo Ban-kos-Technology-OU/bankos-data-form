@@ -216,10 +216,8 @@ const init = ({ key, fields, rejectCallback, fieldCallback, language, apiEndpoin
   
   const handleResponse = (data, path) => {
     if(data.status === 'redirect'){
-      localStorage.clear();
       window.location.href = data.redirectUrl;
     } else if(data.status === 'rejected'){
-      localStorage.clear();
       rejectCallback();
     } else {
       renderForm(data, path);
@@ -237,7 +235,8 @@ const init = ({ key, fields, rejectCallback, fieldCallback, language, apiEndpoin
           render({ path, retries: retries +1 });
         }, 3000)
       }
-    })
+    });
+    localStorage.clear();
   }
 
   const params = JSON.parse(localStorage.getItem('routeParams') || "{}");

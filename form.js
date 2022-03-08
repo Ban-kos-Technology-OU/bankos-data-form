@@ -6,7 +6,7 @@
   apiEndpoint -> api.staging.creditozen.es
 */
 
-const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer' }) => {  
+const init = ({ key, fields, rejectCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer' }) => {  
 
   const translations = {
     ES: {
@@ -41,7 +41,6 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
   })
   
   let currentData = {};
-  let key = null;
   
   const setFieldValue = (name, value) => {
     if(value === 'true') value = true;
@@ -243,25 +242,29 @@ const init = ({ fields, rejectCallback, fieldCallback, language, apiEndpoint, bi
 
   const params = JSON.parse(localStorage.getItem('routeParams') || "{}");
   
-  fetch(`${apiEndpoint}/form/createApplication`, 
-  { 
-    method: 'POST', 
-    headers: { 'content-type': 'application/json' }, 
-    body: JSON.stringify({
-      deviceMemory: navigator.deviceMemory,
-      deviceTimezoneOffset: new Date().getTimezoneOffset(),
-      deviceResolution: parseInt(window.screen.width * window.devicePixelRatio) + "x" + parseInt(window.screen.height * window.devicePixelRatio),
-      language,
-      ...fields,
-      click: params && params.cid ? { connect: { id: params.cid } } : undefined,
-      urlParams: JSON.stringify(params),
-      referrer: localStorage.getItem('referrer') || 'direct'
-    })
-  }).then(res => res.json()).then(data => { 
-    key = data.key;
-    document.dispatchEvent(new Event('loanFormLoaded'));
+  if(!key) {
+    fetch(`${apiEndpoint}/form/createApplication`, 
+    { 
+      method: 'POST', 
+      headers: { 'content-type': 'application/json' }, 
+      body: JSON.stringify({
+        deviceMemory: navigator.deviceMemory,
+        deviceTimezoneOffset: new Date().getTimezoneOffset(),
+        deviceResolution: parseInt(window.screen.width * window.devicePixelRatio) + "x" + parseInt(window.screen.height * window.devicePixelRatio),
+        language,
+        ...fields,
+        click: params && params.cid ? { connect: { id: params.cid } } : undefined,
+        urlParams: JSON.stringify(params),
+        referrer: localStorage.getItem('referrer') || 'direct'
+      })
+    }).then(res => res.json()).then(data => { 
+      key = data.key;
+      document.dispatchEvent(new Event('loanFormLoaded'));
+      render({ path: '/next' });
+    });
+  } else {
     render({ path: '/next' });
-  });
+  }
 
   const updateField = (name, value) => {
     fetch(`${apiEndpoint}/form/next`, {
@@ -299,10 +302,6 @@ const paramsGrab = async () => {
 if(typeof window !== 'undefined') {
   window._Bankos = {
     initForm: init,
-    paramsGrab,
-    setKey: (key) => {
-      currentData.key = key;
-    },
-    render
+    paramsGrab
   }
 }

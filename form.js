@@ -6,8 +6,7 @@
   apiEndpoint -> api.staging.creditozen.es
 */
 
-const init = ({ key, fields, rejectCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer' }) => {  
-
+const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer' }) => {  
   const translations = {
     ES: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -214,9 +213,14 @@ const init = ({ key, fields, rejectCallback, fieldCallback, language, apiEndpoin
       renderButtons();
   }
   
-  const handleResponse = (data, path) => {
+  const handleResponse = (data, path) => { 
     if(data.status === 'redirect'){
-      window.location.href = data.redirectUrl;
+      if(typeof acceptCallback === 'function'){
+        acceptCallback(data.redirectUrl)
+      } else {
+        window.location.href = data.redirectUrl;
+        localStorage.clear();
+      }
     } else if(data.status === 'rejected'){
       rejectCallback();
     } else {

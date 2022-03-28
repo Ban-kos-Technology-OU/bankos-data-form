@@ -13,21 +13,24 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       required: "Este campo es obligatorio",
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
-      false: 'No'
+      false: 'No',
+      pleaseWait: 'Estamos revisando tus datos. Por favor espere'
     },
     PL: {
       months: ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"],
       required: "To pole jest wymagane",
       format: "Proszę wypełnić wymagany formularz",
       true: 'Tak',
-      false: 'No'
+      false: 'No',
+      pleaseWait: 'Sprawdzamy Twoje dane. Proszę trzymać'
     },
     MX: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
       required: "Este campo es obligatorio",
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
-      false: 'No'
+      false: 'No',
+      pleaseWait: 'Estamos revisando tus datos. Por favor espere'
     }
   }
   
@@ -230,8 +233,17 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   
   const render = ({ path='/next', retries=0 }) => {
     if(path === '/next' && retries === 0) mapValuesForSending(currentData);
+    const timeout = setTimeout(() => {
+      const pleaseWait = document.createElement('div');
+      pleaseWait.innerHTML = translations[language].pleaseWait;
+      pleaseWait.style.textAlign = 'center';
+      pleaseWait.style.paddingTop = '10px';
+      pleaseWait.style.color = '#6b6e77';
+      loanFormContainer.appendChild(pleaseWait);
+    }, 5000);
     fetch(`${apiEndpoint}/form${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...currentData, key })}).then(res => res.json()).then(data => {
       if(fieldCallback) fieldCallback(data);
+      clearTimeout(timeout);
       handleResponse(data, path);
     }).catch(err => {
       if(retries < 10) {

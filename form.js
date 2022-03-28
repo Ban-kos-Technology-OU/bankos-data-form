@@ -14,7 +14,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
       false: 'No',
-      pleaseWait: 'Estamos revisando tus datos. Por favor espere'
+      pleaseWait: 'Estamos revisando tus datos. Por favor espere.'
     },
     PL: {
       months: ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"],
@@ -22,7 +22,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Proszę wypełnić wymagany formularz",
       true: 'Tak',
       false: 'No',
-      pleaseWait: 'Sprawdzamy Twoje dane. Proszę trzymać'
+      pleaseWait: 'Sprawdzamy Twoje dane. Proszę czekać.'
     },
     MX: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -30,7 +30,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
       false: 'No',
-      pleaseWait: 'Estamos revisando tus datos. Por favor espere'
+      pleaseWait: 'Estamos revisando tus datos. Por favor espere.'
     }
   }
   
@@ -237,7 +237,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       const pleaseWait = document.createElement('div');
       pleaseWait.innerHTML = translations[language].pleaseWait;
       pleaseWait.style.textAlign = 'center';
-      pleaseWait.style.paddingTop = '10px';
+      pleaseWait.style.marginTop = '10px';
       pleaseWait.style.color = '#6b6e77';
       loanFormContainer.appendChild(pleaseWait);
     }, 5000);

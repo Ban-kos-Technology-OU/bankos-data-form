@@ -305,7 +305,7 @@ const paramsGrab = async () => {
       try {
         const { urlWithParams } = await fetch(`https://api.bankos.io/click${window.location.search}&noRedirect=true`).then(res => res.json());
         const url = new URL(urlWithParams);
-        if(window.location.hostname !== url.hostname) window.href = urlWithParams;
+        if(window.location.hostname !== url.hostname) window.location.href = urlWithParams;
         paramObj = Object.fromEntries(url.searchParams);
       } catch (err) {
         console.error(err);

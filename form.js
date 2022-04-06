@@ -301,7 +301,7 @@ const paramsGrab = async () => {
   if(location.pathname === '/') localStorage.setItem('referrer', document ? document.referrer : 'direct');
   if(window.location.search){
     let paramObj = Object.fromEntries(new URLSearchParams(window.location.search));
-    if(window.location.search.indexOf('redirected=true') === -1){ //Direct hit, new way to do this
+    if(window.location.search.indexOf('redirected=true') === -1 && paramObj.c && paramObj.p){ //Direct hit, new way to do this
       try {
         const { urlWithParams } = await fetch(`https://api.bankos.io/click${window.location.search}&noRedirect=true`).then(res => res.json());
         const url = new URL(urlWithParams);

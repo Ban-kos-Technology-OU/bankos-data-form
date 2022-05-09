@@ -31,8 +31,22 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       true: 'Sí',
       false: 'No',
       pleaseWait: 'Estamos revisando tus datos. Por favor espere.'
+    },
+    KZ: {
+      months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      required: "Este campo es obligatorio",
+      format: "Porfavor rellena el formato requerido",
+      true: 'Sí',
+      false: 'No',
+      pleaseWait: 'Estamos revisando tus datos. Por favor espere.'
     }
   }
+
+  translations['es-ES'] = translations.ES;
+  translations['es-MX'] = translations.MX;
+  translations['pl-PL'] = translations.PL;
+  translations['kk-KZ'] = translations.KZ;
+  translations['ru-KZ'] = translations.KZ;
   
   const loanFormContainer = document.getElementById(bindElement);
 

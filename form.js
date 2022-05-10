@@ -155,7 +155,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     return datePicker;
   }
   
-  const renderButtons = () => {
+  const renderButtons = (data) => {
     const buttonContainer = document.createElement('div');
     buttonContainer.setAttribute('class','button-container');
   
@@ -164,7 +164,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
 
     prevButton.setAttribute('class', 'arrow left');
     prevButton.addEventListener('click', async e => {
-      if(typeof beforePrevious !== 'function' || await beforePrevious()){
+      if(typeof beforePrevious !== 'function' || await beforePrevious(data)){
         prevButton.setAttribute('class', 'lds-dual-ring');
         nextButton.setAttribute('disabled', true);
         render({ path: '/previous' });
@@ -175,7 +175,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
 
     nextButton.setAttribute('class', 'arrow right');
     nextButton.addEventListener('click', async e => {
-      if(typeof beforeNext !== 'function' || await beforeNext()){
+      if(typeof beforeNext !== 'function' || await beforeNext(data)){
         nextButton.setAttribute('class', 'lds-dual-ring');
         prevButton.setAttribute('disabled', true);
         render({ path: '/next' });
@@ -234,7 +234,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }
     
     input && input.focus();
-    renderButtons();
+    renderButtons(data);
   }
   
   const handleResponse = (data, path) => { 

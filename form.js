@@ -267,6 +267,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       clearTimeout(timeout);
       handleResponse(data, path);
     }).catch(err => {
+      console.error(err);
       if(retries < 10) {
         setTimeout(() => {
           render({ path, retries: retries +1 });

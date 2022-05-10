@@ -6,7 +6,7 @@
   apiEndpoint -> api.staging.creditozen.es
 */
 
-const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer' }) => {  
+const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer', beforeNext, beforePrevious }) => {  
   const translations = {
     ES: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -160,18 +160,26 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     buttonContainer.setAttribute('class','button-container');
   
     const prevButton = document.createElement('button');
+    const nextButton = document.createElement('button');
+
     prevButton.setAttribute('class', 'arrow left');
     prevButton.addEventListener('click', e => {
-      prevButton.setAttribute('class', 'lds-dual-ring');
-      render({ path: '/previous' });
+      if(typeof beforePrevious !== 'function' || await beforePrevious()){
+        prevButton.setAttribute('class', 'lds-dual-ring');
+        nextButton.setAttribute('disabled', true);
+        render({ path: '/previous' });
+      }
     });
   
     buttonContainer.appendChild(prevButton);
-    const nextButton = document.createElement('button');
+
     nextButton.setAttribute('class', 'arrow right');
     nextButton.addEventListener('click', e => {
-      nextButton.setAttribute('class', 'lds-dual-ring');
-      render({ path: '/next' });
+      if(typeof beforeNext !== 'function' || await beforeNext()){
+        nextButton.setAttribute('class', 'lds-dual-ring');
+        prevButton.setAttribute('disabled', true);
+        render({ path: '/next' });
+      }
     })
     buttonContainer.appendChild(nextButton);
     loanFormContainer.appendChild(buttonContainer);
@@ -183,51 +191,50 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     const failedValidation = currentField === field.lastField;
     if(currentData[field.name] === undefined) currentData = {};
     currentData.currentField = field.name;
-    const elements = [];
-      const label = document.createElement('label');
-      label.innerText = field.label;
-      loanFormContainer.appendChild(label);
-      let input;
-      switch(field.type){
-        case 'string':
-          input = createInput({ name: field.name, value: field.value });
+    const label = document.createElement('label');
+    label.innerText = field.label;
+    loanFormContainer.appendChild(label);
+    let input;
+    switch(field.type){
+      case 'string':
+        input = createInput({ name: field.name, value: field.value });
+        loanFormContainer.appendChild(input);
+        break;
+      case 'enum':
+        if(field.options.length <= 6) {
+          input = createRadioButtons({ name: field.name, options: field.options, value: field.value })
+          break;
+        } 
+        else {
+          input = createSelect({ name: field.name, options: field.options, value: field.value });
           loanFormContainer.appendChild(input);
           break;
-        case 'enum':
-          if(field.options.length <= 6) {
-            input = createRadioButtons({ name: field.name, options: field.options, value: field.value })
-            break;
-          } 
-          else {
-            input = createSelect({ name: field.name, options: field.options, value: field.value });
-            loanFormContainer.appendChild(input);
-            break;
-          }
-        case 'boolean':
-          input = createRadioButtons({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value });
-          loanFormContainer.appendChild(input);
-          break;
-        case 'number':
-          input = createInput({ name: field.name, type: 'number', value: field.value });
-          loanFormContainer.appendChild(input);
-          break;
-        case 'dateOfBirth':
-          input = createDatePicker({ field, type: 'dateOfBirth' })
-          break;
-        case 'datePast':
-          input = createDatePicker({ field, type: 'datePast' })
-          break;
-      }
-      if(failedValidation && path === '/next'){
-        const errorLabel = document.createElement('div');
-        errorLabel.innerText = field.value > '' ? translations[language].format : translations[language].required;
-        errorLabel.style.paddingTop = "10px";
-        errorLabel.style.color = 'red';
-        loanFormContainer.appendChild(errorLabel);
-      }
-      
-      input && input.focus();
-      renderButtons();
+        }
+      case 'boolean':
+        input = createRadioButtons({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value });
+        loanFormContainer.appendChild(input);
+        break;
+      case 'number':
+        input = createInput({ name: field.name, type: 'number', value: field.value });
+        loanFormContainer.appendChild(input);
+        break;
+      case 'dateOfBirth':
+        input = createDatePicker({ field, type: 'dateOfBirth' })
+        break;
+      case 'datePast':
+        input = createDatePicker({ field, type: 'datePast' })
+        break;
+    }
+    if(failedValidation && path === '/next'){
+      const errorLabel = document.createElement('div');
+      errorLabel.innerText = field.value > '' ? translations[language].format : translations[language].required;
+      errorLabel.style.paddingTop = "10px";
+      errorLabel.style.color = 'red';
+      loanFormContainer.appendChild(errorLabel);
+    }
+    
+    input && input.focus();
+    renderButtons();
   }
   
   const handleResponse = (data, path) => { 
@@ -235,8 +242,8 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       if(typeof acceptCallback === 'function'){
         acceptCallback(data.redirectUrl)
       } else {
-        window.location.href = data.redirectUrl;
         localStorage.clear();
+        window.location.href = data.redirectUrl;
       }
     } else if(data.status === 'rejected'){
       rejectCallback();
@@ -251,7 +258,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       const pleaseWait = document.createElement('div');
       pleaseWait.innerHTML = translations[language].pleaseWait;
       pleaseWait.style.textAlign = 'center';
-      pleaseWait.style.marginTop = '10px';
+      pleaseWait.style.padding = '20px';
       pleaseWait.style.color = '#6b6e77';
       loanFormContainer.appendChild(pleaseWait);
     }, 5000);
@@ -307,7 +314,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     })
   }
 
-  return { updateField }
+  return { updateField, render }
 
 }
 

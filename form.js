@@ -163,7 +163,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     const nextButton = document.createElement('button');
 
     prevButton.setAttribute('class', 'arrow left');
-    prevButton.addEventListener('click', e => {
+    prevButton.addEventListener('click', async e => {
       if(typeof beforePrevious !== 'function' || await beforePrevious()){
         prevButton.setAttribute('class', 'lds-dual-ring');
         nextButton.setAttribute('disabled', true);
@@ -174,7 +174,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     buttonContainer.appendChild(prevButton);
 
     nextButton.setAttribute('class', 'arrow right');
-    nextButton.addEventListener('click', e => {
+    nextButton.addEventListener('click', async e => {
       if(typeof beforeNext !== 'function' || await beforeNext()){
         nextButton.setAttribute('class', 'lds-dual-ring');
         prevButton.setAttribute('disabled', true);

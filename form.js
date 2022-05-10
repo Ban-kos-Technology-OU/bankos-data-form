@@ -322,6 +322,12 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     })
   }
 
+  if(typeof window !== 'undefined') {
+    window._Bankos['render'] = render;
+    window._Bankos['showSpinner'] = showSpinner;
+    window._Bankos['updateField'] = updateField;
+  }
+
   return { updateField, render, showSpinner }
 
 }
@@ -345,8 +351,8 @@ const paramsGrab = async () => {
 }
 
 if(typeof window !== 'undefined') {
-  window._Bankos = {
-    initForm: init,
-    paramsGrab
-  }
+    window._Bankos = {
+      initForm: init,
+      paramsGrab
+    }
 }

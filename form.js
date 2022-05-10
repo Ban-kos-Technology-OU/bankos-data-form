@@ -236,6 +236,13 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     input && input.focus();
     renderButtons(field);
   }
+
+  const showSpinner = () => {
+    loanFormContainer.innerHTML = '';
+    const spinner = document.createElement('div');
+    spinner.setAttribute('class', 'lds-dual-ring');
+    spinner.style.margin = '20px auto';
+  }
   
   const handleResponse = (data, path) => { 
     if(data.status === 'redirect'){
@@ -315,7 +322,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     })
   }
 
-  return { updateField, render }
+  return { updateField, render, showSpinner }
 
 }
 

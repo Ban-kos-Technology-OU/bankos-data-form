@@ -234,7 +234,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }
     
     input && input.focus();
-    renderButtons(data);
+    renderButtons(field);
   }
   
   const handleResponse = (data, path) => { 

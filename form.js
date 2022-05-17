@@ -309,6 +309,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     });
   } else {
     render({ path: '/next' });
+    document.dispatchEvent(new Event('loanFormLoaded'));
   }
 
   const updateField = (name, value) => {

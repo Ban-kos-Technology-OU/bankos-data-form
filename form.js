@@ -303,6 +303,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       })
     }).then(res => res.json()).then(data => { 
       key = data.key;
+      localStorage.setItem('applicationId', data.id);
       document.dispatchEvent(new Event('loanFormLoaded'));
       render({ path: '/next' });
     });

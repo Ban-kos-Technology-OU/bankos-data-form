@@ -254,12 +254,13 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       }
     } else if(data.status === 'rejected'){
       rejectCallback();
+      localStorage.clear();
     } else {
       renderForm(data, path);
     }
   }
   
-  const render = ({ path='/next', retries=0 }) => {
+  const render = ({ path='/next', retries=0, isFirstRender }) => {
     if(path === '/next' && retries === 0) mapValuesForSending(currentData);
     const timeout = setTimeout(() => {
       const pleaseWait = document.createElement('div');
@@ -271,6 +272,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }, 5000);
     fetch(`${apiEndpoint}/form${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...currentData, key })}).then(res => res.json()).then(data => {
       if(fieldCallback) fieldCallback(data);
+      if(isFirstRender) document.dispatchEvent(new CustomEvent('loanFormLoaded', { detail: data.id }));
       clearTimeout(timeout);
       handleResponse(data, path);
     }).catch(err => {
@@ -281,11 +283,10 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
         }, 3000)
       }
     });
-    localStorage.clear();
   }
 
   const params = JSON.parse(localStorage.getItem('routeParams') || "{}");
-  
+
   if(!key) {
     fetch(`${apiEndpoint}/form/createApplication`, 
     { 
@@ -303,13 +304,12 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       })
     }).then(res => res.json()).then(data => { 
       key = data.key;
-      localStorage.setItem('applicationId', data.id);
-      document.dispatchEvent(new Event('loanFormLoaded'));
+      document.dispatchEvent(new CustomEvent('loanFormLoaded', { detail: data.id }));
+      localStorage.clear();
       render({ path: '/next' });
     });
   } else {
-    render({ path: '/next' });
-    document.dispatchEvent(new Event('loanFormLoaded'));
+    render({ path: '/next', isFirstRender: true });
   }
 
   const updateField = (name, value) => {

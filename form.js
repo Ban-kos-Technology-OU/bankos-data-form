@@ -126,7 +126,6 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
 
   }
 
-  
   const createDatePicker = ({ field, type }) => {
     const datePicker = document.createElement('div');
     datePicker.setAttribute('class', 'date-container');
@@ -254,13 +253,12 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       }
     } else if(data.status === 'rejected'){
       rejectCallback();
-      sessionStorage.clear();
     } else {
       renderForm(data, path);
     }
   }
   
-  const render = ({ path='/next', retries=0, isFirstRender }) => {
+  const render = ({ path='/next', retries=0 }) => {
     if(path === '/next' && retries === 0) mapValuesForSending(currentData);
     const timeout = setTimeout(() => {
       const pleaseWait = document.createElement('div');
@@ -272,7 +270,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }, 5000);
     fetch(`${apiEndpoint}/form${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...currentData, key })}).then(res => res.json()).then(data => {
       if(fieldCallback) fieldCallback(data);
-      if(isFirstRender) document.dispatchEvent(new CustomEvent('loanFormLoaded', { detail: data.id }));
+      if(data.id) sessionStorage.setItem('applicationId', data.id);
       clearTimeout(timeout);
       handleResponse(data, path);
     }).catch(err => {
@@ -304,12 +302,11 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       })
     }).then(res => res.json()).then(data => { 
       key = data.key;
-      document.dispatchEvent(new CustomEvent('loanFormLoaded', { detail: data.id }));
-      sessionStorage.clear();
+      sessionStorage.setItem('applicationId', data.id);
       render({ path: '/next' });
     });
   } else {
-    render({ path: '/next', isFirstRender: true });
+    render({ path: '/next' });
   }
 
   const updateField = (name, value) => {

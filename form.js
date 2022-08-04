@@ -249,12 +249,12 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       if(typeof acceptCallback === 'function'){
         acceptCallback(data.redirectUrl)
       } else {
-        localStorage.clear();
+        sessionStorage.clear();
         window.location.href = data.redirectUrl;
       }
     } else if(data.status === 'rejected'){
       rejectCallback();
-      localStorage.clear();
+      sessionStorage.clear();
     } else {
       renderForm(data, path);
     }
@@ -285,7 +285,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     });
   }
 
-  const params = JSON.parse(localStorage.getItem('routeParams') || "{}");
+  const params = JSON.parse(sessionStorage.getItem('routeParams') || "{}");
 
   if(!key) {
     fetch(`${apiEndpoint}/form/createApplication`, 
@@ -300,12 +300,12 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
         ...fields,
         click: params && params.cid ? { connect: { id: params.cid } } : undefined,
         urlParams: JSON.stringify(params),
-        referrer: localStorage.getItem('referrer') || 'direct'
+        referrer: sessionStorage.getItem('referrer') || 'direct'
       })
     }).then(res => res.json()).then(data => { 
       key = data.key;
       document.dispatchEvent(new CustomEvent('loanFormLoaded', { detail: data.id }));
-      localStorage.clear();
+      sessionStorage.clear();
       render({ path: '/next' });
     });
   } else {
@@ -335,7 +335,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
 }
 
 const paramsGrab = async () => {
-  if(location.pathname === '/') localStorage.setItem('referrer', document ? document.referrer : 'direct');
+  if(location.pathname === '/') sessionStorage.setItem('referrer', document ? document.referrer : 'direct');
   if(window.location.search){
     let paramObj = Object.fromEntries(new URLSearchParams(window.location.search));
     if(window.location.search.indexOf('redirected=true') === -1 && paramObj.c && paramObj.p){ //Direct hit, new way to do this
@@ -348,7 +348,7 @@ const paramsGrab = async () => {
         console.error(err);
       }
     }
-    localStorage.setItem('routeParams', JSON.stringify(paramObj || {}));
+    sessionStorage.setItem('routeParams', JSON.stringify(paramObj || {}));
   } 
 }
 

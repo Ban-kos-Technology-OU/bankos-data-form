@@ -6,7 +6,7 @@
   apiEndpoint -> api.staging.creditozen.es
 */
 
-const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer', beforeNext, beforePrevious }) => {  
+const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer', beforeNext, beforePrevious, showButtonLabels }) => {  
   const translations = {
     ES: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -14,7 +14,9 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
       false: 'No',
-      pleaseWait: 'Estamos revisando tus datos. Por favor espere.'
+      pleaseWait: 'Estamos revisando tus datos. Por favor espere.',
+      next: 'Siguiente',
+      previous: 'Anterior'
     },
     PL: {
       months: ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"],
@@ -22,7 +24,9 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Proszę wypełnić wymagany formularz",
       true: 'Tak',
       false: 'No',
-      pleaseWait: 'Sprawdzamy Twoje dane. Proszę czekać.'
+      pleaseWait: 'Sprawdzamy Twoje dane. Proszę czekać.',
+      next: 'Next',
+      previous: 'Previous'
     },
     MX: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -30,7 +34,9 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
       false: 'No',
-      pleaseWait: 'Estamos revisando tus datos. Por favor espere.'
+      pleaseWait: 'Estamos revisando tus datos. Por favor espere.',
+      next: 'Siguiente',
+      previous: 'Anterior'
     },
     KZ: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -38,7 +44,9 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
       false: 'No',
-      pleaseWait: 'Estamos revisando tus datos. Por favor espere.'
+      pleaseWait: 'Estamos revisando tus datos. Por favor espere.',
+      next: 'Next',
+      previous: 'Previous'
     }
   }
 
@@ -160,6 +168,11 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   
     const prevButton = document.createElement('button');
     const nextButton = document.createElement('button');
+
+    if(showButtonLabels){
+      nextButton.innerText = translations[language].next;
+      prevButton.innerText = translations[language].previous;
+    }
 
     prevButton.setAttribute('class', 'arrow left');
     prevButton.addEventListener('click', async e => {

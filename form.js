@@ -113,16 +113,22 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   const createRadioButtons = ({ name, options, value }) => {
     const radioButtons = document.createElement('div');
     radioButtons.setAttribute('class', 'radio-button-container');
+    radioButtons.setAttribute('class', 'radio-button-container');
     options.forEach((optionValues) => {
       const labelValue = document.createElement('label');
+      const dot = document.createElement('div')
+      dot.setAttribute('class', 'dot');
+      const labelText = document.createElement('span');
       const inputValue = document.createElement('input');
-      labelValue.innerHTML =  ['string', 'number'].includes(typeof optionValues) ? optionValues : optionValues.label;
       inputValue.type = "radio";
       inputValue.name = name;
       inputValue.id = optionValues.value
       inputValue.value = optionValues.value;
       inputValue.checked = optionValues.value == value
       labelValue.htmlFor = optionValues.value;
+      labelText.innerHTML = ['string', 'number'].includes(typeof optionValues) ? optionValues : optionValues.label;
+      labelValue.appendChild(dot);
+      labelValue.appendChild(labelText);
       radioButtons.appendChild(inputValue);
       radioButtons.appendChild(labelValue);
       loanFormContainer.appendChild(radioButtons);

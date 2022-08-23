@@ -113,7 +113,6 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   const createRadioButtons = ({ name, options, value }) => {
     const radioButtons = document.createElement('div');
     radioButtons.setAttribute('class', 'radio-button-container');
-    radioButtons.setAttribute('class', 'radio-button-container');
     options.forEach((optionValues) => {
       const labelValue = document.createElement('label');
       const dot = document.createElement('div')
@@ -137,6 +136,32 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       });
    });
    return radioButtons
+
+  }
+
+  const createCheckbox = ({ name, options, value }) => {
+    const checkbox = document.createElement('div');
+    checkbox.setAttribute('class', 'checkbox-container');
+    options.forEach((optionValues) => {
+      const labelValue = document.createElement('label');
+      const labelText = document.createElement('span');
+      const inputValue = document.createElement('input');
+      inputValue.type = "checkbox";
+      inputValue.name = name;
+      inputValue.id = optionValues.value
+      inputValue.value = optionValues.value;
+      inputValue.checked = optionValues.value == value
+      labelValue.htmlFor = optionValues.value;
+      labelText.innerHTML = ['string', 'number'].includes(typeof optionValues) ? optionValues : optionValues.label;
+      labelValue.appendChild(labelText);
+      checkbox.appendChild(inputValue);
+      checkbox.appendChild(labelValue);
+      loanFormContainer.appendChild(checkbox);
+      inputValue.addEventListener('change', e => {  
+        e.target.checked ? setFieldValue(name, e.target.value) : setFieldValue(name, "")
+      });
+   });
+   return checkbox
 
   }
 
@@ -210,7 +235,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     if(currentData[field.name] === undefined) currentData = {};
     currentData.currentField = field.name;
     const label = document.createElement('label');
-    label.innerText = field.label;
+    label.innerText = field.type !== "checkbox" ? field.label : "";
     loanFormContainer.appendChild(label);
     let input;
     switch(field.type){
@@ -232,6 +257,10 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
         input = createRadioButtons({ name: field.name, options: [{ label: translations[language].true, value: true }, { label: translations[language].false, value: false }], value: field.value });
         loanFormContainer.appendChild(input);
         break;
+      case 'checkbox':
+        input = createCheckbox({ name: field.name, options: [{ label: field.label, value: true }], value: field.value });
+        loanFormContainer.appendChild(input);
+        break;  
       case 'number':
         input = createInput({ name: field.name, type: 'number', value: field.value });
         loanFormContainer.appendChild(input);

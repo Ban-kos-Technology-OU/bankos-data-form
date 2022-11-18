@@ -50,6 +50,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }
   }
 
+
   translations['es-ES'] = translations.ES;
   translations['es-MX'] = translations.MX;
   translations['pl-PL'] = translations.PL;
@@ -65,6 +66,8 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   })
   
   let currentData = {};
+
+  
   
   const setFieldValue = (name, value) => {
     if(value === 'true') value = true;
@@ -72,6 +75,136 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     currentData[name] = value;
     if(typeof currentData[name] === 'string') currentData[name] = currentData[name].trim();
   }
+
+  const dateData = {
+    birthDay: {
+      minAge:18,
+      maxAge:82
+    },
+    jobStartDay: {
+      minAge:0,
+      maxAge:64
+    }
+  }
+
+  const checkMinAge = (day,month,dayOptions,monthOptions,minAgeYear) => {
+
+    const currentMonth = new Date().getMonth() + 1 
+    const currentDay = new Date().getDate()
+
+    if(currentData.year === minAgeYear) {
+
+      if(+currentData.month.replace(/^0+/, '') === currentMonth) {
+        dayOptions.map((item,index) => {
+          if(index >= currentDay) {
+            item.disabled = true
+          } 
+        })
+
+        if(+currentData.day.replace(/^0+/, '') > currentDay) {
+          currentData.day = ""
+          day.value = ""
+        }
+        
+      }
+
+      monthOptions.map((item,index) => {
+        if(index > currentMonth) {
+          item.disabled = true
+        } else {
+          item.disabled = false
+        }
+      })
+
+    if(+currentData.month.replace(/^0+/, '') > currentMonth) {
+      currentData.month = ""
+      month.value = ""
+    }
+    }
+  }
+
+  const checkMaxAge = (day,month,dayOptions,monthOptions,maxAgeYear) => {
+
+    const currentMonth = new Date().getMonth() + 1 
+    const currentDay = new Date().getDate()
+
+    if(currentData.year === maxAgeYear) {
+
+      if(+currentData.month.replace(/^0+/, '') === currentMonth) {
+        dayOptions.map((item,index) => {
+          if(index < currentDay) {
+            item.disabled = true
+          }
+        })
+
+        if(+currentData.day.replace(/^0+/, '') < currentDay) {
+          currentData.day = ""
+          day.value = ""
+        }
+        
+      } else {
+        dayOptions.map(item => item.disabled = false)
+      }
+
+      monthOptions.map((item,index) => {
+        if(index < currentMonth) {
+          item.disabled = true
+        } else {
+          item.disabled = false
+        }
+      })
+
+    if(+currentData.month.replace(/^0+/, '') < currentMonth) {
+      currentData.month = ""
+      month.value = ""
+    }
+    } 
+
+  }
+
+  const checkIsDayExist = (day,dayOptions,selectedDateDay) => {
+ 
+      if(currentData.year === "") return
+
+       dayOptions.map((item,index) => {
+        if(index > selectedDateDay) {
+          item.disabled = true
+        }
+      })
+
+      if(selectedDateDay < currentData.day) {
+        day.value = ''
+        currentData.day = ''
+      }
+    
+  }
+
+  
+  const checkDate = (minAge,maxAge) => {
+
+    const day = document.getElementById("day")
+    const month = document.getElementById("month")
+
+    const selectedMonth = +currentData.month.replace(/^0+/, '')
+    const selectedYear = +currentData.year.replace(/^0+/, '')
+    const selectedDateDay = new Date(selectedYear,selectedMonth,0).getDate()
+    const currentYear = new Date().getFullYear()
+    const maxAgeYear = String(currentYear - maxAge)
+    const minAgeYear = String(currentYear - minAge)
+    const monthOptions = [...month.options]
+    const dayOptions = [...day.options]
+
+    if(currentData.year !== minAgeYear && currentData.year !== maxAgeYear && currentData.day < selectedDateDay) {
+      dayOptions.map(item => item.disabled = false)
+      monthOptions.map(item => item.disabled = false)
+    }
+
+    checkMinAge(day,month,dayOptions,monthOptions,minAgeYear)
+    checkMaxAge(day,month,dayOptions,monthOptions,maxAgeYear)
+    checkIsDayExist(day,dayOptions,selectedDateDay)
+
+  }
+
   
   const mapValuesForSending = data => {
     if(['dateOfBirth','incomeContractStartedAt'].includes(data.currentField)) {
@@ -104,8 +237,11 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       select.appendChild(optionElem)
     }    
     select.value = value;
+    select.id = name
     select.addEventListener('change', e => {  
       setFieldValue(name, e.target.value)
+      if(currentData.currentField === "dateOfBirth") checkDate(dateData.birthDay.minAge,dateData.birthDay.maxAge)
+      if(currentData.currentField === "incomeContractStartedAt") checkDate(dateData.jobStartDay.minAge,dateData.jobStartDay.maxAge)
     });
     return select;
   }
@@ -140,13 +276,16 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   }
 
 
+
   const createDatePicker = ({ field, type }) => {
     const datePicker = document.createElement('div');
     datePicker.setAttribute('class', 'date-container');
     currentData.day = field.value ? field.value.split('-')[2] !== 'undefined' ? field.value.split('-')[2] : '' : '';
     currentData.month = field.value ? field.value.split('-')[1] !== 'undefined' ? field.value.split('-')[1] : '' : '';
     currentData.year = field.value ? field.value.split('-')[0] !== 'undefined' ? field.value.split('-')[0] : '' : '';
+
     const day = createSelect({ 
+      id:"day",
       name: 'day', 
       options: Array.from(Array(31).keys()).map(item => ((item + 1).toString().padStart(2,'0'))), 
       value: currentData.day
@@ -165,6 +304,8 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     datePicker.appendChild(month);
     datePicker.appendChild(year);
     loanFormContainer.appendChild(datePicker);
+    if(currentData.currentField === "dateOfBirth") checkDate(dateData.birthDay.minAge,dateData.birthDay.maxAge)
+    if(currentData.currentField === "incomeContractStartedAt") checkDate(dateData.jobStartDay.minAge,dateData.jobStartDay.maxAge)
     return datePicker;
   }
   

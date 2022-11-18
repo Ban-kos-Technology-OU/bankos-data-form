@@ -98,14 +98,16 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
         dayOptions.map((item,index) => {
           if(index >= currentDay) {
             item.disabled = true
-          } 
+          }
         })
 
-        if(+currentData.day.replace(/^0+/, '') > currentDay) {
+        if(+currentData.day.replace(/^0+/, '') >= currentDay) {
           currentData.day = ""
           day.value = ""
         }
         
+      } else {
+        dayOptions.map(item => item.disabled = false)
       }
 
       monthOptions.map((item,index) => {
@@ -194,10 +196,10 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     const monthOptions = [...month.options]
     const dayOptions = [...day.options]
 
-    if(currentData.year !== minAgeYear && currentData.year !== maxAgeYear && currentData.day < selectedDateDay) {
-      dayOptions.map(item => item.disabled = false)
-      monthOptions.map(item => item.disabled = false)
-    }
+   
+    dayOptions.map(item => item.disabled = false)
+    monthOptions.map(item => item.disabled = false)
+    
 
     checkMinAge(day,month,dayOptions,monthOptions,minAgeYear)
     checkMaxAge(day,month,dayOptions,monthOptions,maxAgeYear)

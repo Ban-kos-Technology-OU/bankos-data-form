@@ -39,14 +39,14 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       previous: 'Anterior'
     },
     KZ: {
-      months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      required: "Este campo es obligatorio",
-      format: "Porfavor rellena el formato requerido",
-      true: 'Sí',
-      false: 'No',
-      pleaseWait: 'Estamos revisando tus datos. Por favor espere.',
-      next: 'Next',
-      previous: 'Previous'
+      months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+      required: "Это поле обязательно для заполнения",
+      format: "Пожалуйста, заполните необходимую форму",
+      true: 'Да',
+      false: 'Нет',
+      pleaseWait: 'Мы проверяем ваши данные. Пожалуйста подождите.',
+      next: 'Следующий',
+      previous: 'Предыдущий'
     }
   }
 

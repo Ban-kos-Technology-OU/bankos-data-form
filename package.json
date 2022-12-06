@@ -1,6 +1,6 @@
 {
   "name": "@bankos/bankos-data-form",
-  "version": "1.6.8",
+  "version": "1.6.9",
   "description": "Collect data for bankos",
   "main": "form.js",
   "scripts": {

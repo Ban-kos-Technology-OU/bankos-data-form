@@ -50,7 +50,6 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }
   }
 
-
   translations['es-ES'] = translations.ES;
   translations['es-MX'] = translations.MX;
   translations['pl-PL'] = translations.PL;
@@ -74,11 +73,11 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     if(value === 'false') value = false;
     currentData[name] = value;
     if(typeof currentData[name] === 'string') currentData[name] = currentData[name].trim();
-  }
+  } 
 
   const dateData = {
     birthDay: {
-      minAge:18,
+      minAge:["kk-KZ","ru-KZ"].includes(language) ? 21 : 18,
       maxAge:82
     },
     jobStartDay: {
@@ -299,7 +298,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     });
     const year = createSelect({ 
       name: 'year', 
-      options: type === 'dateOfBirth' ? Array.from(Array(65).keys()).map(item => new Date().getFullYear() - 18 - item) : Array.from(Array(65).keys()).map(item => new Date().getFullYear() - item), 
+      options: type === 'dateOfBirth' ? Array.from(Array(65).keys()).map(item => new Date().getFullYear() - dateData.birthDay.minAge - item) : Array.from(Array(65).keys()).map(item => new Date().getFullYear() - item), 
       value: currentData.year
     });
     datePicker.appendChild(day);

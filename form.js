@@ -512,7 +512,7 @@ const paramsGrab = async () => {
 
 const grabOffers = async () =>  {
   const params = JSON.parse(sessionStorage.getItem('routeParams') || '{}');
-  await fetch(`https://api.bankos.io/application/rejected/${process.env.NEXT_PUBLIC_SOURCE_KEY}?publisher=${params.utm_medium}`).then(res => res.json());
+  return await fetch(`https://api.bankos.io/application/rejected/${process.env.NEXT_PUBLIC_SOURCE_KEY}?publisher=${params.utm_medium}`).then(res => res.json()).catch(err => []);
 } 
 
 if(typeof window !== 'undefined') {

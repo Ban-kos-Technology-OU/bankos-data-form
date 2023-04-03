@@ -67,7 +67,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   let currentData = {};
 
   
-  
+
   const setFieldValue = (name, value) => {
     if(value === 'true') value = true;
     if(value === 'false') value = false;
@@ -223,7 +223,11 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     input.value = value || '';
     if(currentData[name]) input.value = currentData[name];
     input.addEventListener('input', e => {
-      setFieldValue(name, e.target.value);
+      if(type === "number") {
+        setFieldValue(name, +e.target.value);
+      } else {
+        setFieldValue(name, e.target.value);
+      }
     })
     return input;
   }

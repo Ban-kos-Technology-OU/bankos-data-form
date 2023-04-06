@@ -436,6 +436,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     fetch(`${apiEndpoint}/form${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...currentData, key })}).then(res => res.json()).then(data => {
       if(fieldCallback) fieldCallback(data);
       if(data.id) sessionStorage.setItem('applicationId', data.id);
+      if(currentData.currentField === "monthlyIncome") sessionStorage.setItem('monthlyIncome', currentData.monthlyIncome);
       clearTimeout(timeout);
       handleResponse(data, path);
     }).catch(err => {
@@ -468,6 +469,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }).then(res => res.json()).then(data => { 
       key = data.key;
       sessionStorage.setItem('applicationId', data.id);
+      if(data.monthlyIncome) sessionStorage.setItem('monthlyIncome', data.monthlyIncome);
       render({ path: '/next' });
     });
   } else {
@@ -516,7 +518,9 @@ const paramsGrab = async () => {
 
 const grabOffers = async () =>  {
   const params = JSON.parse(sessionStorage.getItem('routeParams') || '{}');
-  return await fetch(`https://api.bankos.io/application/rejected/${process.env.NEXT_PUBLIC_SOURCE_KEY}?publisher=${params.utm_medium}`).then(res => res.json()).catch(err => []);
+  const monthlyIncome = JSON.parse(sessionStorage.getItem('monthlyIncome') || null)
+
+  return await fetch(`https://api.bankos.io/application/rejected/${process.env.NEXT_PUBLIC_SOURCE_KEY}?publisher=${params.utm_medium}&monthlyIncome=${monthlyIncome}`).then(res => res.json()).catch(err => []);
 } 
 
 if(typeof window !== 'undefined') {

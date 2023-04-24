@@ -520,8 +520,8 @@ const paramsGrab = async () => {
 
 const grabOffers = async () =>  {
   const params = JSON.parse(sessionStorage.getItem('routeParams') || '{}');
-  const monthlyIncome = JSON.parse(sessionStorage.getItem('monthlyIncome') || null)
-  const age = JSON.parse(sessionStorage.getItem('age') || null)
+  const monthlyIncome = sessionStorage.getItem('monthlyIncome') || null
+  const age = sessionStorage.getItem('age') || null
 
   return await fetch(`https://api.bankos.io/application/rejected/${process.env.NEXT_PUBLIC_SOURCE_KEY}?publisher=${params.utm_medium}&monthlyIncome=${monthlyIncome}&age=${age}`).then(res => res.json()).catch(err => []);
 } 

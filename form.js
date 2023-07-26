@@ -6,7 +6,16 @@
   apiEndpoint -> api.staging.creditozen.es
 */
 
+
+
+
 const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer', beforeNext, beforePrevious, showButtonLabels }) => {  
+
+  let loading = false;
+  let failedValidationValue = ''
+  let currentData = {};
+  let currentField = {};
+
   const translations = {
     ES: {
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -59,14 +68,21 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   const loanFormContainer = document.getElementById(bindElement);
 
   loanFormContainer.addEventListener('keypress', e => {
+    if(loading) return
+    if(checkSameValue(currentField)) return
     if (e.key === 'Enter' || e.keyCode === 13) {
+      const nextButton = document.querySelector('.arrow.right')
+      const prevButton = document.querySelector('.arrow.left')
+
+      nextButton.setAttribute('class', 'lds-dual-ring');
+      prevButton.setAttribute('disabled', true)
+
       render({ path: '/next' })
+
     }
   })
   
-  let currentData = {};
 
-  
 
   const setFieldValue = (name, value) => {
     if(value === 'true') value = true;
@@ -252,6 +268,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   }
 
   const createRadioButtons = ({ name, options, value }) => {
+
     const radioButtons = document.createElement('div');
     radioButtons.setAttribute('class', 'radio-button-container');
     options.forEach((optionValues) => {
@@ -313,6 +330,34 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     if(currentData.currentField === "incomeContractStartedAt") checkDate(dateData.jobStartDay.minAge,dateData.jobStartDay.maxAge)
     return datePicker;
   }
+
+  function removeSymbols(str) {
+    const regex = /[^a-zA-Z0-9]/g;
+    return str.replace(regex, "");
+  }
+
+  function checkSameValue(data) {
+   
+    const current = ["number","string"].includes(typeof currentData[currentData.currentField]) ? currentData[currentData.currentField].toString() : currentData[currentData.currentField]
+
+    switch (true) {
+      case (current && current === failedValidationValue):
+        return true 
+      case (!current && data.value === failedValidationValue && data.type !== "boolean"):
+        return true 
+      case (data.name === data.lastField && !current && !data.value && data.type !== "boolean"):
+        return true
+      case (data.type === "boolean" && data.name === data.lastField && typeof currentData[currentData.currentField] !== 'boolean' && typeof data.value !== 'boolean'):
+        return true
+      case (["dateOfBirth", "incomeContractStartedAt"].includes(currentData.currentField) && (!currentData.day || !currentData.month || !currentData.year) && data.name === data.lastField):
+        return true
+      case (currentData.currentField === "iban" && current && removeSymbols("ES" + current) === failedValidationValue):
+        return true
+      default:
+        return false
+    }
+
+  }
   
   const renderButtons = (data) => {
     const buttonContainer = document.createElement('div');
@@ -328,6 +373,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
 
     prevButton.setAttribute('class', 'arrow left');
     prevButton.addEventListener('click', async e => {
+      if(loading) return
       if(typeof beforePrevious !== 'function' || await beforePrevious(data)){
         prevButton.setAttribute('class', 'lds-dual-ring');
         nextButton.setAttribute('disabled', true);
@@ -336,19 +382,24 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     });
   
     buttonContainer.appendChild(prevButton);
-
     nextButton.setAttribute('class', 'arrow right');
+    
     nextButton.addEventListener('click', async e => {
+
+      if(loading) return
+      if(checkSameValue(data)) return 
       if(typeof beforeNext !== 'function' || await beforeNext(data)){
         nextButton.setAttribute('class', 'lds-dual-ring');
         prevButton.setAttribute('disabled', true);
         render({ path: '/next' });
+        
       }
     })
+    
     buttonContainer.appendChild(nextButton);
     loanFormContainer.appendChild(buttonContainer);
   }
-  
+
   const renderForm = (field, path) => {
     loanFormContainer.innerHTML = '';
     const currentField = field.name;
@@ -389,17 +440,23 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
         input = createDatePicker({ field, type: 'datePast' })
         break;
     }
+  
     if(failedValidation && path === '/next'){
+      failedValidationValue = field.value || ""
       const errorLabel = document.createElement('div');
       errorLabel.innerText = field.value > '' ? translations[language].format : translations[language].required;
       errorLabel.style.paddingTop = "10px";
       errorLabel.style.color = 'red';
       loanFormContainer.appendChild(errorLabel);
+    } else {
+      failedValidationValue = ""
     }
     
     input && input.focus();
-    renderButtons(field);
+    renderButtons(field,failedValidationValue);
+
   }
+
 
   const showSpinner = () => {
     loanFormContainer.innerHTML = '';
@@ -421,10 +478,13 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     } else {
       renderForm(data, path);
     }
+
   }
   
   const render = ({ path='/next', retries=0 }) => {
+    
     if(path === '/next' && retries === 0) mapValuesForSending(currentData);
+
     const timeout = setTimeout(() => {
       const pleaseWait = document.createElement('div');
       pleaseWait.innerHTML = translations[language].pleaseWait;
@@ -433,13 +493,19 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       pleaseWait.style.color = '#6b6e77';
       loanFormContainer.appendChild(pleaseWait);
     }, 5000);
+
+    loading = true
+
     fetch(`${apiEndpoint}/form${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...currentData, key })}).then(res => res.json()).then(data => {
       if(fieldCallback) fieldCallback(data);
       if(data.id) sessionStorage.setItem('applicationId', data.id);
       if(currentData.currentField === "monthlyIncome") sessionStorage.setItem('monthlyIncome', currentData.monthlyIncome);
       if(currentData.currentField === "dateOfBirth") sessionStorage.setItem('age', currentData.dateOfBirth);
+      currentField = data
       clearTimeout(timeout);
       handleResponse(data, path);
+      loading = false
+
     }).catch(err => {
       console.error(err);
       if(retries < 10) {
@@ -449,6 +515,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       }
     });
   }
+
 
   const params = JSON.parse(sessionStorage.getItem('routeParams') || "{}");
 

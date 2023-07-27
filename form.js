@@ -23,6 +23,10 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
       false: 'No',
+      iban: {
+        field: 'iban',
+        format: 'ES'
+      },
       pleaseWait: 'Estamos revisando tus datos. Por favor espere.',
       next: 'Siguiente',
       previous: 'Anterior'
@@ -33,6 +37,10 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Proszę wypełnić wymagany formularz",
       true: 'Tak',
       false: 'No',
+      iban: {
+        field: 'iban',
+        format: 'PL'
+      },
       pleaseWait: 'Sprawdzamy Twoje dane. Proszę czekać.',
       next: 'Next',
       previous: 'Previous'
@@ -43,6 +51,10 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Porfavor rellena el formato requerido",
       true: 'Sí',
       false: 'No',
+      iban: {
+        field: 'clabe',
+        format: ''
+      },
       pleaseWait: 'Estamos revisando tus datos. Por favor espere.',
       next: 'Siguiente',
       previous: 'Anterior'
@@ -53,6 +65,10 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       format: "Пожалуйста, заполните необходимую форму",
       true: 'Да',
       false: 'Нет',
+      iban: {
+        field: 'iban',
+        format: ''
+      },
       pleaseWait: 'Мы проверяем ваши данные. Пожалуйста подождите.',
       next: 'Следующий',
       previous: 'Предыдущий'
@@ -71,6 +87,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     if(loading) return
     if(checkSameValue(currentField)) return
     if (e.key === 'Enter' || e.keyCode === 13) {
+      
       const nextButton = document.querySelector('.arrow.right')
       const prevButton = document.querySelector('.arrow.left')
 
@@ -82,7 +99,6 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }
   })
   
-
 
   const setFieldValue = (name, value) => {
     if(value === 'true') value = true;
@@ -332,8 +348,9 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   }
 
   function removeSymbols(str) {
+
     const regex = /[^a-zA-Z0-9]/g;
-    return str.replace(regex, "");
+    return (translations[language].iban.format + str).replace(regex, "").replace(translations[language].iban.format, "").toLowerCase();
   }
 
   function checkSameValue(data) {
@@ -351,12 +368,11 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
         return true
       case (["dateOfBirth", "incomeContractStartedAt"].includes(currentData.currentField) && (!currentData.day || !currentData.month || !currentData.year) && data.name === data.lastField):
         return true
-      case (currentData.currentField === "iban" && current && removeSymbols("ES" + current) === failedValidationValue):
+      case (currentData.currentField === translations[language].iban.field && removeSymbols(current) === failedValidationValue.replace(translations[language].iban.format, "").toLowerCase()):
         return true
       default:
         return false
     }
-
   }
   
   const renderButtons = (data) => {

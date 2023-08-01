@@ -11,10 +11,16 @@
 
 const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, language, apiEndpoint, bindElement='formContainer', beforeNext, beforePrevious, showButtonLabels }) => {  
 
+  function debounce(func, timeout = 300){
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+  }
+  
   let loading = false;
-  let failedValidationValue = ''
   let currentData = {};
-  let currentField = {};
 
   const translations = {
     ES: {
@@ -83,9 +89,9 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
   
   const loanFormContainer = document.getElementById(bindElement);
 
-  loanFormContainer.addEventListener('keypress', e => {
+  loanFormContainer.addEventListener('keypress', debounce(e => {
     if(loading) return
-    if(checkSameValue(currentField)) return
+
     if (e.key === 'Enter' || e.keyCode === 13) {
       
       const nextButton = document.querySelector('.arrow.right')
@@ -97,7 +103,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
       render({ path: '/next' })
 
     }
-  })
+  }))
   
 
   const setFieldValue = (name, value) => {
@@ -347,35 +353,7 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     return datePicker;
   }
 
-  function removeSymbols(str) {
-
-    const regex = /[^a-zA-Z0-9]/g;
-    return (translations[language].iban.format + str).replace(regex, "").replace(translations[language].iban.format, "").toLowerCase();
-  }
-
-  function checkSameValue(data) {
-   
-    const current = ["number","string"].includes(typeof currentData[currentData.currentField]) ? currentData[currentData.currentField].toString() : currentData[currentData.currentField]
-
-    switch (true) {
-      case (current && current === failedValidationValue):
-        return true 
-      case (!current && data.value === failedValidationValue && data.type !== "boolean"):
-        return true 
-      case (data.name === data.lastField && !current && !data.value && data.type !== "boolean"):
-        return true
-      case (data.type === "boolean" && data.name === data.lastField && typeof currentData[currentData.currentField] !== 'boolean' && typeof data.value !== 'boolean'):
-        return true
-      case (["dateOfBirth", "incomeContractStartedAt"].includes(currentData.currentField) && (!currentData.day || !currentData.month || !currentData.year) && data.name === data.lastField):
-        return true
-      case (currentData.currentField === translations[language].iban.field && removeSymbols(current) === failedValidationValue.replace(translations[language].iban.format, "").toLowerCase()):
-        return true
-      default:
-        return false
-    }
-  }
-  
-  const renderButtons = (data) => {
+    const renderButtons = (data) => {
     const buttonContainer = document.createElement('div');
     buttonContainer.setAttribute('class','button-container');
   
@@ -388,29 +366,29 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }
 
     prevButton.setAttribute('class', 'arrow left');
-    prevButton.addEventListener('click', async e => {
+    prevButton.addEventListener('click', debounce(async e => {
       if(loading) return
       if(typeof beforePrevious !== 'function' || await beforePrevious(data)){
         prevButton.setAttribute('class', 'lds-dual-ring');
         nextButton.setAttribute('disabled', true);
         render({ path: '/previous' });
       }
-    });
+    }));
   
     buttonContainer.appendChild(prevButton);
     nextButton.setAttribute('class', 'arrow right');
     
-    nextButton.addEventListener('click', async e => {
+    nextButton.addEventListener('click', debounce(async e => {
 
       if(loading) return
-      if(checkSameValue(data)) return 
+
       if(typeof beforeNext !== 'function' || await beforeNext(data)){
         nextButton.setAttribute('class', 'lds-dual-ring');
         prevButton.setAttribute('disabled', true);
-        render({ path: '/next' });
-        
+        render({ path: '/next' })
+
       }
-    })
+    }))
     
     buttonContainer.appendChild(nextButton);
     loanFormContainer.appendChild(buttonContainer);
@@ -458,18 +436,15 @@ const init = ({ key, fields, rejectCallback, acceptCallback, fieldCallback, lang
     }
   
     if(failedValidation && path === '/next'){
-      failedValidationValue = field.value || ""
       const errorLabel = document.createElement('div');
       errorLabel.innerText = field.value > '' ? translations[language].format : translations[language].required;
       errorLabel.style.paddingTop = "10px";
       errorLabel.style.color = 'red';
       loanFormContainer.appendChild(errorLabel);
-    } else {
-      failedValidationValue = ""
     }
     
     input && input.focus();
-    renderButtons(field,failedValidationValue);
+    renderButtons(field);
 
   }
 
